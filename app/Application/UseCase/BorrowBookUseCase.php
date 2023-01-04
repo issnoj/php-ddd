@@ -2,7 +2,6 @@
 
 namespace App\Application\UseCase;
 
-use App\Domain\Entity\Book;
 use App\Domain\Entity\User;
 use App\Infrastructure\Repository\BookCirculationRepository;
 use App\Infrastructure\Repository\BookRepository;
@@ -24,15 +23,17 @@ class BorrowBookUseCase
     /**
      * @throws Exception
      */
-    public function execute(User $user, Book $book): void
+    public function execute(User $user, int $bookId): void
     {
+        $book = $this->bookRepository->getById($bookId);
+
         if (!$book->canBorrow()) {
             throw new Exception("貸出中です");
         }
 
         $maxBorrowingCount = $user->getUserPlan()->getPlan()->maxBorrowingCount();
 
-        $nowBorrowingCount = $this->bookCirculationRepository->borrowingCount($user->getId());
+        $nowBorrowingCount = $this->bookCirculationRepository->borrowingCount($user->id);
 
         if ($nowBorrowingCount >= $maxBorrowingCount) {
             throw new Exception("{$user->getUserPlan()->getPlan()->name()}では{$maxBorrowingCount}冊以上貸出できません");
@@ -41,8 +42,8 @@ class BorrowBookUseCase
         $book->borrow();
 
         $this->bookRepository->update($book);
-        $this->bookCirculationRepository->create($user->getId(), $book->getId(), new DateTime());
+        $this->bookCirculationRepository->create($user->id, $book->id, new DateTime());
 
-        echo "{$book->getTitle()}を借りました" . PHP_EOL;
+        echo "{$book->title}を借りました" . PHP_EOL;
     }
 }

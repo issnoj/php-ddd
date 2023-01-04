@@ -7,9 +7,9 @@ use App\Domain\ValueObject\BookStatus;
 class Book
 {
     private function __construct(
-        private readonly ?int   $id,
-        private readonly string $title,
-        private BookStatus      $status,
+        readonly ?int      $id,
+        readonly string    $title,
+        private BookStatus $status,
     )
     {
     }
@@ -17,22 +17,6 @@ class Book
     public static function create(int $id, string $title): static
     {
         return new static($id, $title, BookStatus::AvailableForBorrow);
-    }
-
-    /**
-     * @return int|null
-     */
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
-
-    /**
-     * @return string
-     */
-    public function getTitle(): string
-    {
-        return $this->title;
     }
 
     /**

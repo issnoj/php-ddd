@@ -20,28 +20,27 @@ $bookRepository->create('AAA');
 $bookRepository->create('BBB');
 $bookRepository->create('CCC');
 $user = $userRepository->getById(1);
-$book1 = $bookRepository->getById(1);
-$book2 = $bookRepository->getById(2);
-$book3 = $bookRepository->getById(3);
+$borrowBookUseCase = new BorrowBookUseCase();
+$changePlanUseCase = new ChangePlanUseCase();
+$returnBookUseCase = new ReturnBookUseCase();
+$getBorrowingBookListQuery = new GetBorrowingBookListQuery();
 
 // 1. 本を 2 冊借りる
-$borrowBookUseCase = new BorrowBookUseCase();
-$borrowBookUseCase->execute($user, $book1);
-$borrowBookUseCase->execute($user, $book2);
+$borrowBookUseCase->execute($user, 1);
+$borrowBookUseCase->execute($user, 2);
 
 // 2. 3 冊目を借りようとするとエラーになる
 try {
-    $borrowBookUseCase->execute($user, $book3);
+    $borrowBookUseCase->execute($user, 3);
 } catch (Exception $exception) {
     echo $exception->getMessage() . PHP_EOL;
 }
 
 // 3. フリープランからスタンダードプランに変更する
-$changePlanUseCase = new ChangePlanUseCase();
 $changePlanUseCase->execute($user, Plan::Standard);
 
 // 4. 3 冊目を借りる
-$borrowBookUseCase->execute($user, $book3);
+$borrowBookUseCase->execute($user, 3);
 
 // 5. スタンダードプランからフリープランに変更しようとするとエラーになる
 try {
@@ -50,15 +49,20 @@ try {
     echo $exception->getMessage() . PHP_EOL;
 }
 
-// 6. 最初に借りた本を返す
-$returnBookUseCase = new ReturnBookUseCase();
-$returnBookUseCase->execute($user, $book1);
+// 6. 借りた日付より前の日付で返そうとするとエラーになる
+try {
+    $returnBookUseCase->execute($user, 1, new DateTime("2023-01-01"));
+} catch (Exception $exception) {
+    echo $exception->getMessage() . PHP_EOL;
+}
 
-// 7. スタンダードプランからフリープランに変更する
+// 7. 借りた本を返す
+$returnBookUseCase->execute($user, 1, new DateTime());
+
+// 8. スタンダードプランからフリープランに変更する
 $changePlanUseCase->execute($user, Plan::Free);
 
-// 8. 借りている本を確認する
-$getBorrowingBookListQuery = new GetBorrowingBookListQuery();
+// 9. 借りている本を確認する
 echo "借りている本：" . PHP_EOL;
 foreach ($getBorrowingBookListQuery->execute(1) as $v) {
     echo "\t{$v['id']},{$v['title']},{$v['borrowDate']}" . PHP_EOL;

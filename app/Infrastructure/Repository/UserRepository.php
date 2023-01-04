@@ -28,7 +28,8 @@ class UserRepository
     public function update(User $user): ?User
     {
         foreach ($this->storage->data['User'] as $k => $v) {
-            if ($v->getId() === $user->getId()) {
+            /* @var $v User */
+            if ($v->id === $user->id) {
                 $this->storage->data['User'][$k] = $user;
                 return $user;
             }
@@ -37,12 +38,15 @@ class UserRepository
         return null;
     }
 
-    public function getById(int $id): User
+    public function getById(int $id): ?User
     {
-        foreach ($this->storage->data['User'] as $user) {
-            if ($user->getId() === $id) {
-                return $user;
+        foreach ($this->storage->data['User'] as $v) {
+            /* @var $v User */
+            if ($v->id === $id) {
+                return $v;
             }
         }
+
+        return null;
     }
 }

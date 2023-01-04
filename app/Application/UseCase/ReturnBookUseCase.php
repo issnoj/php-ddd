@@ -2,7 +2,6 @@
 
 namespace App\Application\UseCase;
 
-use App\Domain\Entity\Book;
 use App\Domain\Entity\User;
 use App\Infrastructure\Repository\BookCirculationRepository;
 use App\Infrastructure\Repository\BookRepository;
@@ -24,24 +23,26 @@ class ReturnBookUseCase
     /**
      * @throws Exception
      */
-    public function execute(User $user, Book $book): void
+    public function execute(User $user, int $bookId, DateTime $date): void
     {
+        $book = $this->bookRepository->getById($bookId);
+
         if ($book->canBorrow()) {
             throw new Exception("この本は貸出中ではありません");
         }
 
-        $bookCirculation = $this->bookCirculationRepository->getByUserAndBook($user->getId(), $book->getId());
+        $bookCirculation = $this->bookCirculationRepository->getByUserAndBook($user->id, $book->id);
 
         if (!$bookCirculation) {
             throw new Exception("この本は別の人が借りています");
         }
 
         $book->return();
-        $bookCirculation->setReturnDate(new DateTime());
+        $bookCirculation->setReturnDate($date);
 
         $this->bookRepository->update($book);
         $this->bookCirculationRepository->update($bookCirculation);
 
-        echo "{$book->getTitle()}を返却しました" . PHP_EOL;
+        echo "{$book->title}を返却しました" . PHP_EOL;
     }
 }

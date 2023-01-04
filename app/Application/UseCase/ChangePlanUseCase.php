@@ -30,7 +30,7 @@ class ChangePlanUseCase
 
         $maxBorrowingCount = $plan->maxBorrowingCount();
 
-        $nowBorrowingCount = $this->bookCirculationRepository->borrowingCount($user->getId());
+        $nowBorrowingCount = $this->bookCirculationRepository->borrowingCount($user->id);
 
         if ($nowBorrowingCount > $maxBorrowingCount) {
             throw new Exception("現在{$nowBorrowingCount}冊貸出中のため、{$plan->name()}にプランを変更できません");

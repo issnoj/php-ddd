@@ -3,15 +3,16 @@
 namespace App\Domain\Entity;
 
 use DateTime;
+use Exception;
 
 class BookCirculation
 {
     private function __construct(
-        private readonly int       $id,
-        private readonly int       $userId,
-        private readonly int       $bookId,
-        private readonly ?DateTime $borrowDate,
-        private ?DateTime          $returnDate,
+        readonly int       $id,
+        readonly int       $userId,
+        readonly int       $bookId,
+        readonly ?DateTime $borrowDate,
+        private ?DateTime  $returnDate,
     )
     {
     }
@@ -19,38 +20,6 @@ class BookCirculation
     public static function create($id, $userId, $bookId, $borrowDate): static
     {
         return new static($id, $userId, $bookId, $borrowDate, null);
-    }
-
-    /**
-     * @return int
-     */
-    public function getId(): int
-    {
-        return $this->id;
-    }
-
-    /**
-     * @return int
-     */
-    public function getUserId(): int
-    {
-        return $this->userId;
-    }
-
-    /**
-     * @return int
-     */
-    public function getBookId(): int
-    {
-        return $this->bookId;
-    }
-
-    /**
-     * @return DateTime|null
-     */
-    public function getBorrowDate(): ?DateTime
-    {
-        return $this->borrowDate;
     }
 
     /**
@@ -64,9 +33,14 @@ class BookCirculation
     /**
      * @param DateTime $date
      * @return void
+     * @throws Exception
      */
     public function setReturnDate(DateTime $date): void
     {
+        if ($date < $this->borrowDate) {
+            throw new Exception("日付が正しくありません");
+        }
+
         $this->returnDate = $date;
     }
 }

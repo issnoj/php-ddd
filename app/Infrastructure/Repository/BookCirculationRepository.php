@@ -26,16 +26,14 @@ class BookCirculationRepository
         return $bookCirculation;
     }
 
-    public function update(BookCirculation $bookCirculation): ?BookCirculation
+    public function update(BookCirculation $bookCirculation): void
     {
         foreach ($this->storage->data['BookCirculation'] as $k => $v) {
-            if ($v->getId() === $bookCirculation->getId()) {
+            /* @var $v BookCirculation */
+            if ($v->id === $bookCirculation->id) {
                 $this->storage->data['BookCirculation'][$k] = $bookCirculation;
-                return $bookCirculation;
             }
         }
-
-        return null;
     }
 
     public function borrowingCount(int $userId): int
@@ -43,7 +41,8 @@ class BookCirculationRepository
         $count = 0;
 
         foreach ($this->storage->data['BookCirculation'] as $v) {
-            if ($v->getUserId() === $userId && !$v->getReturnDate()) {
+            /* @var $v BookCirculation */
+            if ($v->userId === $userId && !$v->getReturnDate()) {
                 $count++;
             }
         }
@@ -54,7 +53,8 @@ class BookCirculationRepository
     public function getByUserAndBook(int $userId, int $bookId): ?BookCirculation
     {
         foreach ($this->storage->data['BookCirculation'] as $v) {
-            if ($v->getUserId() === $userId && $v->getBookId() === $bookId) {
+            /* @var $v BookCirculation */
+            if ($v->userId === $userId && $v->bookId === $bookId) {
                 return $v;
             }
         }

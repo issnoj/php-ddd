@@ -25,23 +25,22 @@ class BookRepository
         return $user;
     }
 
-    public function update(Book $book): ?Book
+    public function update(Book $book): void
     {
         foreach ($this->storage->data['Book'] as $k => $v) {
-            if ($v->getId() === $book->getId()) {
+            /* @var $v Book */
+            if ($v->id === $book->id) {
                 $this->storage->data['Book'][$k] = $book;
-                return $book;
             }
         }
-
-        return null;
     }
 
     public function getById(int $id): ?Book
     {
-        foreach ($this->storage->data['Book'] as $book) {
-            if ($book->getId() === $id) {
-                return $book;
+        foreach ($this->storage->data['Book'] as $v) {
+            /* @var $v Book */
+            if ($v->id === $id) {
+                return clone($v);
             }
         }
 

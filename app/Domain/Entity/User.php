@@ -4,12 +4,12 @@ namespace App\Domain\Entity;
 
 use App\Domain\ValueObject\Plan;
 
-class User
+readonly class User
 {
     private function __construct(
-        readonly ?int $id,
-        private string        $name,
-        private UserPlan      $userPlan,
+        public ?int     $id,
+        public string   $name,
+        public UserPlan $userPlan,
     )
     {
     }
@@ -26,21 +26,5 @@ class User
     public function getUserPlan(): UserPlan
     {
         return $this->userPlan;
-    }
-
-    /**
-     * @return int|null
-     */
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
-
-    /**
-     * @return string
-     */
-    public function getName(): string
-    {
-        return $this->name;
     }
 }
